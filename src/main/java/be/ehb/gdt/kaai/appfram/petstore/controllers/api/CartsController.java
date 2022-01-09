@@ -3,8 +3,8 @@ package be.ehb.gdt.kaai.appfram.petstore.controllers.api;
 import be.ehb.gdt.kaai.appfram.petstore.data.CartRepository;
 import be.ehb.gdt.kaai.appfram.petstore.data.ProductRepository;
 import be.ehb.gdt.kaai.appfram.petstore.models.Cart;
-import be.ehb.gdt.kaai.appfram.petstore.models.CartItem;
 import be.ehb.gdt.kaai.appfram.petstore.models.Product;
+import be.ehb.gdt.kaai.appfram.petstore.models.ProductItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +29,8 @@ public class CartsController {
 
     @PostMapping("cart/add/{productId}/{amount}")
     public ResponseEntity<Cart> addProductToCart(@PathVariable long productId, @PathVariable int amount) {
-        Cart cart = saveCartItem(productId, amount);
-        if(cart == null) {
+        Cart cart = saveItem(productId, amount);
+        if (cart == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(cart);
@@ -38,36 +38,36 @@ public class CartsController {
 
     @PostMapping("cart/add/{productId}")
     public ResponseEntity<Cart> addProductToCart(@PathVariable long productId) {
-        Cart cart = saveCartItem(productId, 1);
-        if(cart == null) {
+        Cart cart = saveItem(productId, 1);
+        if (cart == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(cart);
     }
 
-    private Cart saveCartItem(long productId, int amount) {
+    private Cart saveItem(long productId, int amount) {
         Product product = productRepo.findById(productId).orElse(null);
         if (product == null) {
             return null;
         }
         Cart cart = getCurrentCart();
-        CartItem cartItem = getCartItemById(cart, productId);
-        if (cartItem == null) {
-            cartItem = new CartItem(product, amount);
-            cart.getCartItems().add(cartItem);
+        ProductItem item = getItemById(cart, productId);
+        if (item == null) {
+            item = new ProductItem(product, amount, cart);
+            cart.addProduct(item);
         } else {
-            cartItem.setAmount(cartItem.getAmount() + amount);
+            item.setAmount(item.getAmount() + amount);
         }
         return cartRepo.save(cart);
     }
 
     @DeleteMapping("cart/delete/{productId}")
-    public ResponseEntity<Cart> deleteCartItem(@PathVariable long productId) {
-        if(!productRepo.existsById(productId)) {
+    public ResponseEntity<Cart> deleteItem(@PathVariable long productId) {
+        if (!productRepo.existsById(productId)) {
             return ResponseEntity.notFound().build();
         }
         Cart cart = getCurrentCart();
-        cart.getCartItems().removeIf(item -> item.getProduct().getId() == productId);
+        cart.getItems().removeIf(item -> item.getProduct().getId() == productId);
         return ResponseEntity.ok(cartRepo.save(cart));
     }
 
@@ -77,11 +77,11 @@ public class CartsController {
             return ResponseEntity.notFound().build();
         }
         Cart cart = getCurrentCart();
-        CartItem cartItem = getCartItemById(cart, productId);
-        if(cartItem == null) {
+        ProductItem item = getItemById(cart, productId);
+        if (item == null) {
             return ResponseEntity.notFound().build();
         }
-        cartItem.setAmount(amount);
+        item.setAmount(amount);
         cartRepo.save(cart);
 
         return ResponseEntity.ok(cart);
@@ -89,11 +89,11 @@ public class CartsController {
 
     private Cart getCurrentCart() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return cartRepo.findByUserUsername(username);
+        return cartRepo.findByUserUsername(username).orElse(null);
     }
 
-    public CartItem getCartItemById(Cart cart, long productId) {
-        return cart.getCartItems().stream()
+    public ProductItem getItemById(Cart cart, long productId) {
+        return cart.getItems().stream()
                 .filter(item -> item.getProduct().getId() == productId)
                 .findFirst().orElse(null);
     }

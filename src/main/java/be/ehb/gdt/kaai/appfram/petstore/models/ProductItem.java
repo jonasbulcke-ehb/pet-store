@@ -6,29 +6,34 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 
 @Entity
-@Table(name = "cart_items")
-public class CartItem {
+@Table(name = "product_items")
+public class ProductItem {
     @Id
     @GeneratedValue
     private long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonIgnore
+//    @JoinColumn(name = "cart_id")
     private Cart cart;
-    @Min(1)
+    @ManyToOne
+    @JsonIgnore
+//    @JoinColumn(name = "order_id")
+    private Order order;
+    @Min(value = 1)
     private int amount;
     @ManyToOne
     private Product product;
 
-    public CartItem() {
+    public ProductItem() {
 
     }
 
-    public CartItem(Product product, int amount) {
+    public ProductItem(Product product, int amount) {
         this.product = product;
         this.amount = amount;
     }
 
-    public CartItem(Product product, int amount, Cart cart) {
+    public ProductItem(Product product, int amount, Cart cart) {
         this.product = product;
         this.amount = amount;
         this.cart = cart;

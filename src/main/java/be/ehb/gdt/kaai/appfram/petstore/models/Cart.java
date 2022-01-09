@@ -12,15 +12,15 @@ public class Cart {
     @OneToOne
     @JoinColumn(name = "user_id")
     private AppUser user;
-    @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    private Set<CartItem> cartItems;
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "cart")
+    private Set<ProductItem> items;
 
     public double getTotal() {
-        return cartItems.stream().map(CartItem::getSubtotal).reduce(0.0, Double::sum);
+        return items.stream().map(ProductItem::getSubtotal).reduce(0.0, Double::sum);
     }
 
     public int getTotalAmount() {
-        return cartItems.stream().map(CartItem::getAmount).reduce(0, Integer::sum);
+        return items.stream().map(ProductItem::getAmount).reduce(0, Integer::sum);
     }
 
     public long getId() {
@@ -39,20 +39,24 @@ public class Cart {
         this.user = user;
     }
 
-    public Set<CartItem> getCartItems() {
-        return cartItems;
+    public Set<ProductItem> getItems() {
+        return items;
     }
 
-    public void setCartItems(Set<CartItem> cartItems) {
-        this.cartItems = cartItems;
+    public void setItems(Set<ProductItem> items) {
+        this.items = items;
     }
 
-    public void addProduct(CartItem cartItem) {
-        cartItems.add(cartItem);
+    public void addProduct(ProductItem item) {
+        items.add(item);
     }
 
     public void addProduct(Product product, int amount) {
-        CartItem cartItem = new CartItem(product, amount);
-        cartItems.add(cartItem);
+        ProductItem item = new ProductItem(product, amount);
+        items.add(item);
+    }
+
+    public void empty() {
+        items.clear();
     }
 }
