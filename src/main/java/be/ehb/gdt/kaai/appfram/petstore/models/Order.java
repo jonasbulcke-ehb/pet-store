@@ -1,6 +1,7 @@
 package be.ehb.gdt.kaai.appfram.petstore.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -11,20 +12,20 @@ public class Order {
     private long id;
     @ManyToOne
     private AppUser user;
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.MERGE)
     private Set<ProductItem> items;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Address shippingAddress;
 
     public Order() {
 
     }
 
-    public Order(Cart cart, Address shippingAddress) {
-        this.shippingAddress = shippingAddress;
-        user = cart.getUser();
-        items = cart.getItems();
-    }
+//    public Order(Cart cart, Address shippingAddress) {
+//        this.shippingAddress = shippingAddress;
+//        user = cart.getUser();
+//        items = Set.copyOf(cart.getItems());
+//    }
 
     public double getTotal() {
         return items.stream().map(ProductItem::getSubtotal).reduce(0.0, Double::sum);

@@ -13,11 +13,9 @@ public class ProductItem {
     private long id;
     @ManyToOne
     @JsonIgnore
-//    @JoinColumn(name = "cart_id")
     private Cart cart;
     @ManyToOne
     @JsonIgnore
-//    @JoinColumn(name = "order_id")
     private Order order;
     @Min(value = 1)
     private int amount;
@@ -57,6 +55,14 @@ public class ProductItem {
 
     public void setCart(Cart cart) {
         this.cart = cart;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
     public int getAmount() {

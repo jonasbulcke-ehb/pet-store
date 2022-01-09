@@ -72,7 +72,7 @@ public class CartsController {
     }
 
     @PutMapping("cart/update/{productId}/{amount}")
-    private ResponseEntity<Cart> updateAmount(@PathVariable long productId, @PathVariable int amount) {
+    public ResponseEntity<Cart> updateAmount(@PathVariable long productId, @PathVariable int amount) {
         if (!productRepo.existsById(productId)) {
             return ResponseEntity.notFound().build();
         }

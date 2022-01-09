@@ -12,7 +12,7 @@ public class Cart {
     @OneToOne
     @JoinColumn(name = "user_id")
     private AppUser user;
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "cart")
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductItem> items;
 
     public double getTotal() {

@@ -1,13 +1,11 @@
 package be.ehb.gdt.kaai.appfram.petstore.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "addresses")
@@ -78,5 +76,27 @@ public class Address {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Address address = (Address) o;
+
+        if (zipcode != address.zipcode) return false;
+        if (!addressLine1.equals(address.addressLine1)) return false;
+        if (!Objects.equals(addressLine2, address.addressLine2)) return false;
+        return city.equals(address.city);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = addressLine1.hashCode();
+        result = 31 * result + (addressLine2 != null ? addressLine2.hashCode() : 0);
+        result = 31 * result + zipcode;
+        result = 31 * result + city.hashCode();
+        return result;
     }
 }
